@@ -5,7 +5,7 @@ Generate a RAG-powered answer grounded in persistent agent memory.
 ## Syntax
 
 ```
-/memanto:answer question "<question>" [type <type>]
+/memanto:answer question "<question>" [limit <n>]
 ```
 
 ## Parameters
@@ -13,7 +13,7 @@ Generate a RAG-powered answer grounded in persistent agent memory.
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `question` | The question to answer | Required |
-| `type` | Filter context to this memory type | All types |
+| `limit` | Max memories to use as context | 5 |
 
 ## Examples
 

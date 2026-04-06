@@ -11,8 +11,8 @@ memanto memory sync --project-dir .
 # Export to a specific directory
 memanto memory sync --project-dir /path/to/project
 
-# Export with format options
-memanto memory export --format markdown --output ./reports/memory-snapshot.md
+# Export to a custom path
+memanto memory export --output ./reports/memory-snapshot.md
 ```
 
 ## View All Memories by Type
@@ -47,8 +47,8 @@ memanto recall "." --as-of "7d ago" --limit 20
 ## Audit by Confidence
 
 ```bash
-# Find low-confidence memories (candidates for review or deletion)
-memanto recall "." --max-confidence 0.7 --limit 50
+# Find high-confidence memories
+memanto recall "." --min-confidence 0.9 --limit 50
 
 # Find memories that may be stale (old observations)
 memanto recall "." --type observation --as-of "30d ago" --limit 20

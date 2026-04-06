@@ -26,7 +26,6 @@ MEMANTO is a universal memory layer built on top of Moorcheh — a semantic data
 - **13 memory types** (facts, decisions, preferences, goals, errors, and more)
 - **Trust scoring** via confidence levels and provenance tracking
 - **Session management** with JWT-based agent identity
-- **Multi-agent memory sharing** across workspaces
 
 ## Installation
 
@@ -117,7 +116,6 @@ Core operations for giving agents persistent memory:
 Blueprints for complete memory-powered AI applications:
 
 - **Persistent Agent Memory** — Full setup for an agent with long-term memory
-- **Multi-Agent Memory Sharing** — Share memory across agents in a team
 - **Session Continuity** — Resume exactly where you left off across sessions
 - **Memory Export & Audit** — Export, visualize, and audit agent memories
 - **Daily Summary Automation** — Automated memory digests on a schedule
