@@ -1,0 +1,8 @@
+{
+  "name": "memanto",
+  "description": "MEMANTO plugin for Cursor — persistent memory, semantic recall, and RAG for AI agents",
+  "version": "0.1.0",
+  "author": "Moorcheh AI",
+  "website": "https://moorcheh.ai",
+  "skillsDir": "./skills/"
+}

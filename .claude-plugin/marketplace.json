@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    {
+      "name": "memanto",
+      "description": "Persistent memory, semantic recall, and RAG for Claude Code",
+      "version": "1.0.0",
+      "owner": "Moorcheh AI",
+      "website": "https://moorcheh.ai",
+      "repository": "moorcheh-ai/memanto-agent-skills"
+    }
+  ]
+}

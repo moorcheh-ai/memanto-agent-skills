@@ -1,0 +1,51 @@
+{
+  "name": "memanto-agent-skills",
+  "version": "0.1.0",
+  "description": "Agent Skills for giving AI agents persistent memory with MEMANTO — the Universal Memory Layer for Agentic AI",
+  "keywords": [
+    "memanto",
+    "memory",
+    "agent",
+    "ai",
+    "rag",
+    "persistent-memory",
+    "moorcheh",
+    "agent-skills",
+    "semantic-search",
+    "vector-database",
+    "ai-memory",
+    "langchain",
+    "llamaindex",
+    "agentic-ai",
+    "cursor",
+    "claude-code",
+    "copilot",
+    "codex"
+  ],
+  "homepage": "https://github.com/moorcheh-ai/memanto-agent-skills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moorcheh-ai/memanto-agent-skills.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Moorcheh AI",
+    "url": "https://moorcheh.ai"
+  },
+  "files": [
+    "skills/",
+    "commands/",
+    ".claude-plugin/",
+    ".cursor-plugin/",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "agentskills": {
+    "skills": [
+      "skills/memanto",
+      "skills/memanto-cookbooks"
+    ]
+  }
+}
