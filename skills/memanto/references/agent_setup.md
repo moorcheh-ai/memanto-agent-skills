@@ -58,8 +58,40 @@ memanto agent deactivate
 ## Delete an Agent
 
 ```bash
-# This removes the agent's local metadata but does NOT delete memories from Moorcheh
 memanto agent delete my-agent
+```
+
+The CLI runs a **two-step delete**:
+
+1. **Confirm deletion** — interactive prompt (skip with `--force`)
+2. **Keep cloud memories?** — prompts whether to preserve or purge the Moorcheh namespace
+   - Default is **keep** (`Y`) — local metadata removed, cloud memories preserved
+   - Choose `n` — also deletes `memanto_agent_{agent_id}` namespace and all stored memories from Moorcheh (non-recoverable)
+
+```bash
+# Skip confirmation prompt
+memanto agent delete my-agent --force
+```
+
+**What always happens:**
+- Calls `DELETE /api/v2/agents/{agent_id}`
+- Removes `~/.memanto/agents/{agent_id}.json`
+- Clears active session if this agent was currently active
+
+**What happens only if you choose to purge cloud memories:**
+- Deletes the Moorcheh namespace `memanto_agent_{agent_id}`
+- All stored memories are permanently removed
+
+**Note:** Cloud memories at [console.moorcheh.ai/namespaces](https://console.moorcheh.ai/namespaces) survive local deletion by default. A re-created agent with the same ID can access them again.
+
+Or via the Python script:
+
+```bash
+uv run skills/memanto/scripts/delete_agent.py --agent-id my-agent
+
+# Skip prompts
+uv run skills/memanto/scripts/delete_agent.py --agent-id my-agent --force --keep-cloud
+uv run skills/memanto/scripts/delete_agent.py --agent-id my-agent --force --delete-cloud
 ```
 
 ## Error Handling
