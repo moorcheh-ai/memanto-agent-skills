@@ -5,7 +5,7 @@ MEMANTO uses JWT-based sessions to identify which agent is active. Sessions have
 ## Session Lifecycle
 
 ```
-agent create → agent activate → [work] → session extend → [work] → agent deactivate
+agent create → agent activate → [work] → agent deactivate
 ```
 
 ## Commands
@@ -18,20 +18,11 @@ memanto session info
 
 Output:
 ```
-Agent:      my-agent
-Session ID: sess_abc123
-Namespace:  memanto_agent_my-agent
-Started:    2025-03-15 09:00:00
-Expires:    2025-03-15 15:00:00
-Remaining:  4h 32m
-Status:     active
-```
-
-### Extend Session
-
-```bash
-memanto session extend
-memanto session extend --hours 4
+Agent ID:        my-agent
+Session Token:   eyJ... (truncated)
+Status:          Active
+Expires At:      2025-03-15 15:00:00
+Time Remaining:  4h 32m
 ```
 
 ### View All Agents
@@ -86,7 +77,6 @@ When calling the MEMANTO API directly, include the session token as a header:
 
 ```
 X-Session-Token: eyJ...
-Authorization: Bearer YOUR_MOORCHEH_API_KEY
 ```
 
 ## Auto-Hook (Claude Code)
@@ -109,5 +99,5 @@ This populates `MEMORY.md` every time Claude Code starts, ensuring full context 
 | CI/CD pipeline | 1–2 hours |
 
 ```bash
-memanto agent activate my-agent --duration-hours 24
+memanto agent activate my-agent --hours 24
 ```

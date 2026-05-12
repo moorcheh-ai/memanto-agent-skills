@@ -27,7 +27,7 @@ memanto agent activate my-agent
 
 With custom duration:
 ```bash
-memanto agent activate my-agent --duration-hours 12
+memanto agent activate my-agent --hours 12
 ```
 
 **What this does:**
@@ -41,14 +41,7 @@ memanto agent activate my-agent --duration-hours 12
 memanto session info
 ```
 
-Output includes: agent ID, session ID, namespace, time remaining.
-
-## Extend a Session
-
-```bash
-memanto session extend
-memanto session extend --hours 4
-```
+Output includes: agent ID, token preview, status, expiry, and time remaining.
 
 ## List Agents
 
@@ -59,7 +52,7 @@ memanto agent list
 ## Deactivate / End Session
 
 ```bash
-memanto agent deactivate my-agent
+memanto agent deactivate
 ```
 
 ## Delete an Agent
@@ -76,27 +69,32 @@ memanto agent delete my-agent
 | `No active session` | Session expired or never activated | Run `memanto agent activate <id>` |
 | `Agent not found` | Agent ID doesn't exist locally | Run `memanto agent list` to see available agents |
 | `Session expired` | Token lifetime exceeded | Run `memanto agent activate <id>` again |
-| `API key missing` | `MOORCHEH_API_KEY` not set | Run `memanto config set api-key YOUR_KEY` |
+| `API key missing` | `MOORCHEH_API_KEY` not set | Run `memanto` to configure interactively |
 
-## Python SDK
+## Python SDK (REST API)
 
 ```python
+import httpx
 import asyncio
-from memanto.app.services.agent_service import AgentService
-from memanto.app.services.session_service import SessionService
 
 async def setup_agent():
-    agent_svc = AgentService()
-    session_svc = SessionService()
+    base_url = "http://localhost:8000"
 
-    # Create agent
-    agent = await agent_svc.create_agent("my-agent", pattern="tool")
-    print(f"Agent namespace: {agent.namespace}")
+    async with httpx.AsyncClient() as client:
+        # Create agent
+        resp = await client.post(
+            f"{base_url}/api/v2/agents",
+            json={"name": "my-agent"}
+        )
+        agent = resp.json()
+        print(f"Agent namespace: {agent.get('namespace')}")
 
-    # Activate session
-    session = await session_svc.create_session(agent.agent_id)
-    print(f"Session token: {session.session_token}")
-    print(f"Expires: {session.expires_at}")
+        # Activate session
+        resp = await client.post(f"{base_url}/api/v2/agents/my-agent/activate")
+        session = resp.json()
+        print(f"Session token: {session.get('session_token')}")
+        print(f"Expires: {session.get('expires_at')}")
 
-asyncio.run(setup_agent())
+if __name__ == "__main__":
+    asyncio.run(setup_agent())
 ```

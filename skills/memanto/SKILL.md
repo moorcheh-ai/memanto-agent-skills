@@ -27,7 +27,7 @@ See [environment_requirements.md](references/environment_requirements.md) for fu
 ```bash
 pip install memanto
 export MOORCHEH_API_KEY="your-api-key"
-memanto config set api-key YOUR_KEY
+memanto
 memanto agent create my-agent
 memanto agent activate my-agent
 ```

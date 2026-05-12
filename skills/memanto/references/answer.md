@@ -72,9 +72,8 @@ async def get_answer(agent_id: str, session_token: str, question: str):
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"http://localhost:8000/api/v2/agents/{agent_id}/answer",
-            json={"query": question},
+            json={"question": question},
             headers={
-                "Authorization": f"Bearer {MOORCHEH_API_KEY}",
                 "X-Session-Token": session_token,
             }
         )

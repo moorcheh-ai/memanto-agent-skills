@@ -29,7 +29,7 @@ source ~/.bashrc
 
 **Via memanto CLI (stores in `~/.memanto/.env`):**
 ```bash
-memanto config set api-key YOUR_KEY
+memanto
 ```
 
 ## Installation
@@ -61,7 +61,7 @@ MEMANTO uses two-layer authentication:
 
 ```bash
 # Set API key (one time)
-memanto config set api-key YOUR_MOORCHEH_API_KEY
+memanto
 
 # Create agent (one time per project/agent)
 memanto agent create my-agent
@@ -82,10 +82,4 @@ memanto agent activate my-agent
 ```bash
 # View current config
 memanto config show
-
-# Set custom server URL (for self-hosted deployments)
-memanto config set server-url http://localhost:8000
-
-# Set default session duration (hours)
-memanto config set session-duration-hours 12
 ```

@@ -75,23 +75,27 @@ memanto recall "instructions decisions goals" --limit 20
 memanto recall "commitments todo" --type commitment
 ```
 
-## Python SDK
+## Python SDK (REST API)
 
 ```python
-from memanto.app.services.memory_read_service import MemoryReadService
+import httpx
 
-async def search_memories(namespace: str, session_token: str):
-    svc = MemoryReadService()
-
-    results = await svc.search_memories(
-        namespace=namespace,
-        query="database architecture decisions",
-        memory_type="decision",
-        min_confidence=0.8,
-        limit=10,
-        session_token=session_token,
+async def search_memories(agent_id: str, session_token: str):
+  async with httpx.AsyncClient() as client:
+    response = await client.post(
+      f"http://localhost:8000/api/v2/agents/{agent_id}/recall",
+      json={
+        "query": "database architecture decisions",
+        "type": "decision",
+        "min_confidence": 0.8,
+        "limit": 10,
+      },
+      headers={
+        "X-Session-Token": session_token,
+      },
     )
+    results = response.json().get("memories", [])
 
     for memory in results:
-        print(f"[{memory.confidence:.2f}] {memory.title}: {memory.content[:100]}")
+      print(f"[{memory.get('confidence', 0):.2f}] {memory.get('type')}: {memory.get('content')[:100]}")
 ```

@@ -13,7 +13,8 @@ memanto memory sync --project-dir .
 ```bash
 memanto memory sync \
   --project-dir /path/to/project \
-  --format markdown
+  --agent my-agent \
+  --limit 25
 ```
 
 ## Parameters
@@ -21,7 +22,8 @@ memanto memory sync \
 | Flag | Description | Default |
 |------|-------------|---------|
 | `--project-dir` | Directory where MEMORY.md will be written | Current directory |
-| `--format` | Output format (`markdown`) | `markdown` |
+| `--agent` | Target agent identifier | Active agent |
+| `--limit` | Maximum memories per type | 25 |
 
 ## What Gets Written
 

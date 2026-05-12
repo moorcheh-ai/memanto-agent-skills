@@ -141,28 +141,28 @@ memanto remember "Batch storing 100 memories at once is ~100x faster than storin
 5. **Missing tags** — Always include tags; they're the primary retrieval mechanism
 6. **Wrong confidence** — Don't use 0.9 for a single observation; use 0.65–0.75
 
-## Python SDK
+## Python SDK (REST API)
 
 ```python
-from memanto.app.services.memory_write_service import MemoryWriteService
-from memanto.app.core import MemoryRecord, MemoryType, ProvenanceType
+import httpx
+import asyncio
 
-async def store_memory(namespace: str, session_token: str):
-    svc = MemoryWriteService()
-
-    record = MemoryRecord(
-        type=MemoryType.DECISION,
-        content="Chose PostgreSQL over SQLite for production workloads.",
-        confidence=0.95,
-        provenance=ProvenanceType.EXPLICIT_STATEMENT,
-        source="my_agent",
-        tags=["database", "postgresql", "architecture"],
-    )
-
-    result = await svc.store_memory(
-        namespace=namespace,
-        record=record,
-        session_token=session_token,
-    )
-    print(f"Stored: {result.id}")
+async def store_memory(agent_id: str, session_token: str):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"http://localhost:8000/api/v2/agents/{agent_id}/remember",
+            json={
+                "type": "decision",
+                "content": "Chose PostgreSQL over SQLite for production workloads.",
+                "confidence": 0.95,
+                "provenance": "explicit_statement",
+                "source": "my_agent",
+                "tags": ["database", "postgresql", "architecture"]
+            },
+            headers={
+                "X-Session-Token": session_token,
+            }
+        )
+        result = response.json()
+        print(f"Stored Memory ID: {result.get('memory_id')}")
 ```
