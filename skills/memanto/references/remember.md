@@ -61,6 +61,7 @@ memanto remember "content" \
 | `observed` | Witnessed in action |
 | `corrected` | Updated after a contradiction |
 | `validated` | Confirmed/verified by evidence |
+| `imported` | Brought in from an external source (file upload, sync, migration) |
 
 ## Tagging Best Practices
 

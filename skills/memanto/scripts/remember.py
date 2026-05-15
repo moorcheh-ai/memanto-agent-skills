@@ -36,7 +36,7 @@ VALID_TYPES = [
 ]
 
 VALID_PROVENANCE = [
-    "explicit_statement", "inferred", "observed", "corrected", "validated",
+    "explicit_statement", "inferred", "observed", "corrected", "validated", "imported",
 ]
 
 

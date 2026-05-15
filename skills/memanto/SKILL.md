@@ -70,6 +70,6 @@ memanto answer "What are my pending commitments?"
 - `0.6–0.65` — Single observation, uncertain
 - `< 0.6` — Do NOT store. Too uncertain.
 
-**Provenance Types:** `explicit_statement` · `inferred` · `observed` · `corrected` · `validated`
+**Provenance Types:** `explicit_statement` · `inferred` · `observed` · `corrected` · `validated` · `imported`
 
 Common errors relate to missing API keys, expired sessions (re-run `memanto agent activate`), and missing agent IDs. See individual reference files for details.
