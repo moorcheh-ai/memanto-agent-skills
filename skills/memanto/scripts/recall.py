@@ -1,11 +1,19 @@
 """
 MEMANTO Recall Script
 
-Searches persistent memories for the active agent using semantic similarity.
+Searches persistent memories for the active agent. Supports semantic recall plus
+three temporal modes (as-of, changed-since, recent).
 
 Usage:
+    # Semantic search (default)
     uv run recall.py "database architecture"
     uv run recall.py "authentication" --type fact --min-confidence 0.8 --limit 5
+
+    # Temporal modes (omit the query)
+    uv run recall.py --as-of "2026-05-01T12:00:00Z"
+    uv run recall.py --changed-since "2026-05-03"
+    uv run recall.py --recent --limit 10
+    uv run recall.py --recent --type fact
 
 Requirements:
     uv pip install memanto httpx
@@ -22,6 +30,7 @@ Requirements:
 import argparse
 import asyncio
 import sys
+from typing import Any
 
 import httpx
 
@@ -38,10 +47,13 @@ VALID_TYPES = [
 
 
 async def search_memories(
-    query: str,
+    query: str | None,
     memory_type: str | None,
     min_confidence: float,
     limit: int,
+    as_of: str | None,
+    changed_since: str | None,
+    recent: bool,
 ) -> None:
     api_key = load_api_key()
     session = load_session()
@@ -49,19 +61,45 @@ async def search_memories(
     session_token = session["session_token"]
     base_url = get_base_url()
 
-    params = {
-        "q": query,
-        "limit": limit,
-        "min_confidence": min_confidence,
-    }
-    if memory_type:
-        params["type"] = memory_type
+    # Resolve endpoint + body based on which mode was selected
+    type_list = [memory_type] if memory_type else None
+    if recent:
+        path = "recall/recent"
+        body: dict[str, Any] = {"limit": limit}
+        if type_list:
+            body["type"] = type_list
+        mode_label = "Recent (newest first)"
+    elif as_of:
+        path = "recall/as-of"
+        body = {"as_of": as_of, "limit": limit}
+        if type_list:
+            body["type"] = type_list
+        mode_label = f"As of {as_of}"
+    elif changed_since:
+        path = "recall/changed-since"
+        body = {"since": changed_since, "limit": limit}
+        if type_list:
+            body["type"] = type_list
+        mode_label = f"Changed since {changed_since}"
+    else:
+        if not query:
+            print("Error: a query is required unless --recent, --as-of, or --changed-since is set.", file=sys.stderr)
+            sys.exit(2)
+        path = "recall"
+        body = {
+            "query": query,
+            "limit": limit,
+            "min_confidence": min_confidence,
+        }
+        if type_list:
+            body["type"] = type_list
+        mode_label = f"Semantic search for '{query}'"
 
     async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.get(
-            f"{base_url}/api/v2/agents/{agent_id}/recall",
+        response = await client.post(
+            f"{base_url}/api/v2/agents/{agent_id}/{path}",
             headers=get_headers(api_key, session_token),
-            params=params,
+            json=body,
         )
 
     if response.status_code != 200:
@@ -72,10 +110,10 @@ async def search_memories(
     memories = results.get("memories", [])
 
     if not memories:
-        print("No memories found.")
+        print(f"No memories found ({mode_label}).")
         return
 
-    print(f"Found {len(memories)} memories for '{query}':\n")
+    print(f"Found {len(memories)} memories ({mode_label}):\n")
     for i, mem in enumerate(memories, 1):
         conf = mem.get("confidence", 0)
         mtype = mem.get("type", "unknown")
@@ -93,17 +131,32 @@ async def search_memories(
 
 def main():
     parser = argparse.ArgumentParser(description="Search MEMANTO persistent memories")
-    parser.add_argument("query", help="Natural language search query")
+    parser.add_argument("query", nargs="?", default=None, help="Natural language search query (omit for temporal modes)")
     parser.add_argument("--type", choices=VALID_TYPES, dest="memory_type", default=None)
     parser.add_argument("--min-confidence", type=float, default=0.0)
     parser.add_argument("--limit", type=int, default=10)
+    parser.add_argument("--as-of", dest="as_of", default=None, help="Point-in-time query (ISO date/datetime)")
+    parser.add_argument("--changed-since", dest="changed_since", default=None, help="Differential query (ISO date/datetime)")
+    parser.add_argument("--recent", action="store_true", help="List most recently stored memories (newest first)")
     args = parser.parse_args()
+
+    temporal_flags = [bool(args.as_of), bool(args.changed_since), args.recent]
+    if sum(temporal_flags) > 1:
+        print("Error: --as-of, --changed-since, and --recent are mutually exclusive.", file=sys.stderr)
+        sys.exit(2)
+
+    if args.query and any(temporal_flags):
+        print("Error: do not pass a query alongside --as-of, --changed-since, or --recent.", file=sys.stderr)
+        sys.exit(2)
 
     asyncio.run(search_memories(
         query=args.query,
         memory_type=args.memory_type,
         min_confidence=args.min_confidence,
         limit=args.limit,
+        as_of=args.as_of,
+        changed_since=args.changed_since,
+        recent=args.recent,
     ))
 
 
