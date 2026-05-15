@@ -1,8 +1,13 @@
 {
   "name": "memanto",
+  "displayName": "MEMANTO",
+  "version": "0.2.0",
   "description": "MEMANTO plugin for Cursor — persistent memory, semantic recall, and RAG for AI agents",
-  "version": "0.1.0",
-  "author": "Moorcheh AI",
-  "website": "https://moorcheh.ai",
+  "author": {
+    "name": "Moorcheh AI",
+    "url": "https://moorcheh.ai"
+  },
+  "homepage": "https://docs.memanto.ai",
+  "license": "MIT",
   "skillsDir": "./skills/"
 }

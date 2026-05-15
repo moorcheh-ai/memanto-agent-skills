@@ -1,12 +1,28 @@
 {
+  "name": "moorcheh-ai",
+  "owner": {
+    "name": "Moorcheh AI",
+    "url": "https://moorcheh.ai"
+  },
+  "description": "Official Moorcheh AI marketplace — MEMANTO persistent memory for Claude Code.",
   "plugins": [
     {
       "name": "memanto",
-      "description": "Persistent memory, semantic recall, and RAG for Claude Code",
-      "version": "1.0.0",
-      "owner": "Moorcheh AI",
-      "website": "https://moorcheh.ai",
-      "repository": "moorcheh-ai/memanto-agent-skills"
+      "source": "./",
+      "displayName": "MEMANTO",
+      "description": "Persistent memory for Claude Code — store decisions, recall them semantically, and answer questions grounded in everything the agent has learned.",
+      "version": "0.2.0",
+      "author": {
+        "name": "Moorcheh AI",
+        "url": "https://moorcheh.ai"
+      },
+      "category": "memory",
+      "tags": [
+        "memory",
+        "rag",
+        "semantic-search",
+        "moorcheh"
+      ]
     }
   ]
 }

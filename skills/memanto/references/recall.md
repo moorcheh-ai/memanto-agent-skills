@@ -1,34 +1,42 @@
 # Recall — Search Persistent Memories
 
-The `memanto recall` command performs semantic search across all stored memories for the active agent.
+`memanto recall` searches all memories for the active agent, semantically or by time.
 
-## Basic Usage
+## Usage
 
 ```bash
 memanto recall "query"
 ```
 
-## Full Syntax
-
-```bash
-memanto recall "query" \
-  --limit 10 \
-  --type fact \
-  --min-confidence 0.8 \
-  --as-of "2d ago" \
-  --changed-since "1h ago"
-```
-
-## Parameters
+## Flags
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `query` | Natural language search query | Required |
-| `--limit` | Max results to return | 10 |
-| `--type` | Filter by memory type | All types |
-| `--min-confidence` | Minimum trust score | 0.0 |
-| `--as-of` | Show memories as of a point in time | Now |
-| `--changed-since` | Only memories changed since a time | None |
+| `query` | Natural language search query | Required, except with the temporal flags |
+| `--limit` / `-n` | Max results | 10 |
+| `--type` / `-t` | Filter by memory type | All types |
+| `--min-confidence` | Minimum stored confidence (0.0–1.0) | 0.0 |
+| `--min-similarity` | Minimum semantic similarity score | None |
+| `--tags` | Filter by tags (comma-separated) | None |
+| `--as-of` | Point in time: what was true then | — |
+| `--changed-since` | Differential: what changed since then | — |
+| `--recent` | Newest first, chronological; needs no query | Off |
+| `--active` | Active memories only | Off |
+| `--expired` | Expired memories only | Off |
+
+`--as-of`, `--changed-since`, and `--recent` are mutually exclusive, and none of them takes a
+query.
+
+## Active vs expired
+
+By default recall returns **both** active and expired memories, each clearly labelled. An
+expired memory is one that a policy sweep or a manual `memanto memory expire` retired — it still
+carries its content and history. Narrow with `--active` or `--expired`.
+
+```bash
+memanto recall "deployment" --active     # only what is currently true
+memanto recall "deployment" --expired    # only what used to be true
+```
 
 ## Examples
 
@@ -36,66 +44,48 @@ memanto recall "query" \
 # General search
 memanto recall "database architecture"
 
-# Search for decisions only
+# Decisions only
 memanto recall "frontend framework" --type decision
 
 # High-confidence facts
 memanto recall "API authentication" --type fact --min-confidence 0.9
 
-# Recent changes
-memanto recall "deployment" --changed-since "24h ago"
+# Tag-scoped
+memanto recall "token refresh" --tags "auth,security"
 
-# Historical state (what did we know 2 days ago?)
-memanto recall "auth setup" --as-of "2d ago"
+# Tighten semantic matching to cut loose results
+memanto recall "rate limiting" --min-similarity 0.8
 
-# Find all commitments
-memanto recall "todo will implement" --type commitment
+# What changed recently
+memanto recall --changed-since "24h ago"
 
-# Search for errors and lessons
-memanto recall "bug fix" --type error
+# What was true two days ago
+memanto recall --as-of "2d ago"
 
-# Multiple concepts (broad search)
+# Newest first, no query
+memanto recall --recent --limit 10
+memanto recall --recent --type decision --limit 5
+
+# Broad context load
 memanto recall "instructions decisions goals" --limit 20
 ```
 
-## Time Format
+## Time formats
 
-The `--as-of` and `--changed-since` flags accept natural language:
-- `"1h ago"` — 1 hour ago
-- `"2d ago"` — 2 days ago
-- `"1w ago"` — 1 week ago
-- `"2025-03-15"` — specific date
+`--as-of` and `--changed-since` accept relative or ISO forms:
 
-## Session Start Pattern
+- `"1h ago"`, `"2d ago"`, `"1w ago"`, `"last 7 days"`
+- `"2026-08-15"` or `"2026-08-15T12:00:00Z"`
 
-Always run this at the start of a session to load context:
+## Session start pattern
 
 ```bash
 memanto recall "instructions decisions goals" --limit 20
-memanto recall "commitments todo" --type commitment
+memanto recall "todo pending" --type commitment
 ```
 
-## Python SDK (REST API)
+## recall or answer?
 
-```python
-import httpx
-
-async def search_memories(agent_id: str, session_token: str):
-  async with httpx.AsyncClient() as client:
-    response = await client.post(
-      f"http://localhost:8000/api/v2/agents/{agent_id}/recall",
-      json={
-        "query": "database architecture decisions",
-        "type": "decision",
-        "min_confidence": 0.8,
-        "limit": 10,
-      },
-      headers={
-        "X-Session-Token": session_token,
-      },
-    )
-    results = response.json().get("memories", [])
-
-    for memory in results:
-      print(f"[{memory.get('confidence', 0):.2f}] {memory.get('type')}: {memory.get('content')[:100]}")
-```
+`recall` returns raw memories for you to read and act on. `answer` synthesizes one grounded
+response. If your next step is *"read these and act"*, use `recall`; if it is *"deliver this as
+the answer"*, use `answer`. See [answer.md](answer.md).

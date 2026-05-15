@@ -1,9 +1,24 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "memanto",
-  "description": "MEMANTO plugin for Claude Code — persistent memory, semantic recall, and RAG for AI agents",
-  "version": "0.1.0",
-  "author": "Moorcheh AI",
-  "website": "https://moorcheh.ai",
-  "skillsDir": "./skills/",
-  "commandsDir": "./commands/"
+  "displayName": "MEMANTO",
+  "version": "0.2.0",
+  "description": "Persistent memory for Claude Code — store decisions, recall them semantically, and answer questions grounded in everything the agent has learned.",
+  "author": {
+    "name": "Moorcheh AI",
+    "url": "https://moorcheh.ai"
+  },
+  "homepage": "https://docs.memanto.ai",
+  "repository": "https://github.com/moorcheh-ai/memanto-agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "persistent-memory",
+    "agent-memory",
+    "semantic-search",
+    "rag",
+    "moorcheh",
+    "memanto"
+  ],
+  "hooks": "./hooks/hooks.json"
 }

@@ -1,59 +1,93 @@
 # MEMANTO Agent Skills — Setup Guide
 
-This repository provides agent skills for giving AI agents persistent memory via MEMANTO.
+This repository provides agent skills that give AI agents persistent memory via MEMANTO.
 
 ## Prerequisites
 
-- Python 3.10+
-- A [Moorcheh](https://console.moorcheh.ai) account
-- `MOORCHEH_API_KEY` environment variable set
+- Python 3.10–3.12
+- A [Moorcheh](https://console.moorcheh.ai) account (free)
 
 ## Quick Setup
 
 ```bash
-# Install MEMANTO CLI
 pip install memanto
 
-# Set your API key
+# Configure — either run the interactive wizard...
+memanto
+# ...or set the key yourself
 export MOORCHEH_API_KEY="your-api-key"
 
-# Create and activate an agent
+# Create the agent (this activates it too)
 memanto agent create my-agent
-memanto agent activate my-agent
+memanto status
 ```
+
+There is no `memanto config set` command; the wizard and the environment variable are the two
+ways to supply an API key.
 
 ## Skills in this Repository
 
 | Skill | Description |
 |-------|-------------|
-| [memanto](skills/memanto/SKILL.md) | Core memory operations — remember, recall, answer, session management |
+| [memanto](skills/memanto/SKILL.md) | Core memory operations — remember, recall, answer, correct, upload, sync |
 | [memanto-cookbooks](skills/memanto-cookbooks/SKILL.md) | Blueprints for memory-powered AI applications |
 
 ## Key Commands
 
 ```bash
-# Store a memory
-memanto remember "content" --type fact --confidence 0.9 --provenance explicit_statement --source agent_name
+# Store
+memanto remember "content" --type decision --confidence 0.9 \
+  --provenance explicit_statement --source claude_code --tags "a,b"
 
-# Search memories
-memanto recall "query"
+# Retrieve
+memanto recall "query" --limit 10 --type decision --tags "auth"
+memanto recall --recent --limit 10          # newest first, no query
+memanto recall --as-of "2026-01-15"         # what was true then
+memanto answer "What did we decide about X?"
 
-# Ask a question (RAG)
-memanto answer "question"
+# Correct and retire
+memanto edit <id> --content "..." --confidence 0.95
+memanto memory expire <id> --reason superseded   # reversible
+memanto forget <id> --force                      # permanent
 
-# Sync memories to MEMORY.md
+# Documents
+memanto upload report.pdf
+
+# Project context
 memanto memory sync --project-dir .
 
-# View session info
+# Housekeeping
+memanto detect-conflicts && memanto conflicts --list
+memanto policy show
+memanto schedule enable         # nightly summary + conflict detection + expiry sweep
+
+# Session
+memanto status
 memanto session info
+memanto agent list
 ```
 
 ## Memory Types
 
-`fact` · `decision` · `preference` · `instruction` · `goal` · `commitment` · `artifact` · `learning` · `event` · `relationship` · `observation` · `error` · `context`
+`fact` · `decision` · `preference` · `instruction` · `goal` · `commitment` · `artifact` ·
+`learning` · `event` · `relationship` · `observation` · `error` · `context`
+
+## Provenance
+
+`explicit_statement` · `inferred` · `observed` · `corrected` · `validated` · `imported`
+
+## Notes
+
+- `memanto agent create` creates **and** activates. Only use `memanto agent activate` to switch
+  back to an existing agent.
+- Sessions auto-renew by default. There is no `session extend` command; set the lifetime up
+  front with `memanto agent activate <id> --hours <n>`.
+- The CLI talks to Moorcheh directly. `memanto serve` is only needed for the HTTP API and
+  `memanto ui`, not for ordinary CLI use.
 
 ## Resources
 
-- [Documentation](https://docs.moorcheh.ai)
-- [Agent Integration Guide](https://docs.moorcheh.ai/agent-integration)
-- [CLI User Guide](https://docs.moorcheh.ai/cli)
+- [Documentation](https://docs.memanto.ai)
+- [CLI Reference](https://docs.memanto.ai/cli/overview)
+- [Claude Code Integration](https://docs.memanto.ai/integrations/claude-code)
+- [Memory Types Reference](https://docs.memanto.ai/reference/memory-types)

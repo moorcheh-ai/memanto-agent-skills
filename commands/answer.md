@@ -1,46 +1,29 @@
-# /memanto:answer
+---
+description: Answer a question from MEMANTO memory (RAG)
+argument-hint: <question>
+allowed-tools: Bash(memanto:*)
+disable-model-invocation: true
+---
 
-Generate a RAG-powered answer grounded in persistent agent memory.
+Answer this question using MEMANTO's memory-grounded RAG:
 
-## Syntax
-
-```
-/memanto:answer question "<question>" [limit <n>]
-```
-
-## Parameters
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `question` | The question to answer | Required |
-| `limit` | Max memories to use as context | 5 |
-
-## Examples
+$ARGUMENTS
 
 ```bash
-# General question
-memanto answer "What database did we choose and why?"
-
-# Ask about commitments
-memanto answer "What are my pending commitments?"
-
-# Ask about decisions
-memanto answer "What frontend framework did we decide on?"
-
-# Ask about preferences
-memanto answer "What coding conventions does the user prefer?"
-
-# Ask about errors encountered
-memanto answer "What bugs have we had with the auth system?"
+memanto answer "$ARGUMENTS"
 ```
 
-## MANDATORY Rule
+Add `--type <type>` to restrict the context to one memory type (for example `--type commitment`
+for "what did I promise?"), and `--limit <n>` to widen or narrow the retrieved context beyond
+the default of 5.
 
-Before saying "I don't know" or "I don't have context on that", ALWAYS run:
+Then:
 
-```bash
-memanto recall "topic of the question"
-memanto answer "What did we decide about X?"
-```
+- Relay the answer along with the memories it was grounded in, so the user can judge it.
+- If the answer is thin or the sources look weak, follow up with
+  `memanto recall "<topic>" --limit 20` and reason over the raw memories yourself.
+- If MEMANTO genuinely has nothing on this, say so explicitly — and offer to store the answer
+  once you work it out together.
 
-These must be run first. Never claim ignorance without checking memory.
+Never answer this from your own conversation context alone. The point of the command is what
+is in memory, not what is in this session.

@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "memanto",
+            "args": ["memory", "sync", "--project-dir", "${CLAUDE_PROJECT_DIR}"],
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

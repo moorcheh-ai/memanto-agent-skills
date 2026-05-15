@@ -1,50 +1,41 @@
-# /memanto:remember
+---
+description: Store something in MEMANTO persistent memory
+argument-hint: <what to remember>
+allowed-tools: Bash(memanto:*)
+disable-model-invocation: true
+---
 
-Store a persistent memory for the active agent.
+Store this in MEMANTO persistent memory:
 
-## Syntax
+$ARGUMENTS
 
-```
-/memanto:remember content "<text>" type <type> [confidence <0.0-1.0>] [provenance <type>] [tags "<tag1,tag2>"]
-```
+Steps:
 
-## Parameters
+1. **Check for duplicates first.** Run `memanto recall` with the key terms. If a memory already
+   covers this, update it with `memanto edit <id>` instead of storing a near-duplicate.
 
-| Parameter | Description | Required |
-|-----------|-------------|----------|
-| `content` | The memory text | Yes |
-| `type` | Memory type | Yes |
-| `confidence` | Trust score 0.0–1.0 | Recommended |
-| `provenance` | Source classification | Recommended |
-| `source` | Agent/tool name | Recommended |
-| `tags` | Comma-separated tags | Recommended |
+2. **Classify it.** Pick exactly one type:
+   `fact` · `decision` · `preference` · `instruction` · `goal` · `commitment` · `artifact` ·
+   `learning` · `event` · `relationship` · `observation` · `error` · `context`
 
-## Memory Types
+3. **Score confidence.** `1.0` explicit user statement · `0.9–0.95` strong consensus ·
+   `0.8–0.85` pattern seen 3+ times · `0.7–0.75` reasonable inference · `0.6–0.65` single
+   uncertain observation. **Below 0.6, do not store** — say so and stop.
 
-`fact` · `decision` · `preference` · `instruction` · `goal` · `commitment` · `artifact` · `learning` · `event` · `relationship` · `observation` · `error` · `context`
+4. **Set provenance** to how you learned it: `explicit_statement`, `inferred`, `observed`,
+   `corrected`, `validated`, or `imported`.
 
-## Examples
+5. **Write the content so it stands alone.** Someone reading it in three months with no
+   conversation context should understand it. Include the reason and any commit or file
+   reference. "Fixed the bug" is a failure; "Fixed OAuth token expiry bug by refreshing 60s
+   early, commit abc123" is not.
+
+6. **Store it** with 2–5 specific lowercase-hyphenated tags:
 
 ```bash
-# Store a decision
-memanto remember "Chose PostgreSQL over SQLite for production. Reason: need JSONB and FTS." \
-  --type decision --confidence 0.95 --provenance explicit_statement --source claude_code \
-  --tags "database,postgresql,architecture"
-
-# Store a user preference
-memanto remember "User prefers tabs over spaces in all languages." \
-  --type preference --confidence 1.0 --provenance explicit_statement --source claude_code \
-  --tags "formatting,style,tabs"
-
-# Store a commitment
-memanto remember "Will implement rate limiting before v0.2 release." \
-  --type commitment --confidence 1.0 --provenance explicit_statement --source claude_code \
-  --tags "rate-limiting,todo,v0.2"
+memanto remember "<self-contained content>" \
+  --type <type> --confidence <0.0-1.0> --provenance <provenance> \
+  --source claude_code --tags "<tag1,tag2,tag3>"
 ```
 
-## Rules
-
-- Confidence < 0.6 → don't store (too uncertain)
-- Always include `--type`, `--confidence`, `--provenance`, `--source`
-- Always include 2–5 `--tags`
-- Search first with `memanto recall` to avoid duplicates
+Report back what you stored, with its type and confidence.

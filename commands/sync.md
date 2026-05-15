@@ -1,47 +1,26 @@
-# /memanto:sync
+---
+description: Sync MEMANTO memories into the project's MEMORY.md
+argument-hint: [project-dir]
+allowed-tools: Bash(memanto:*)
+disable-model-invocation: true
+---
 
-Sync agent memories to `MEMORY.md` in the project root.
-
-## Syntax
-
-```
-/memanto:sync [project_dir <path>]
-```
-
-## Examples
+Sync MEMANTO memories to `MEMORY.md`. Target directory (default `.`): `$ARGUMENTS`
 
 ```bash
-# Sync to current directory
-memanto memory sync --project-dir .
-
-# Sync to specific project
-memanto memory sync --project-dir /path/to/project
+memanto memory sync --project-dir "${ARGUMENTS:-.}"
 ```
 
-## What This Does
+Useful flags:
 
-Exports all agent memories to `MEMORY.md` as a structured markdown file. The agent should read this file at the start of every session to load full context.
+- `--limit <n>` — memories per type in the export (default 25)
+- `--agent <id>` — sync a specific agent rather than the active one
+- `--okf` — write an [Open Knowledge Format](https://docs.memanto.ai/integrations/okf) bundle to
+  `<project>/okf` instead of a single `MEMORY.md`, with `--split auto|file|type`
 
-## When to Run
+After syncing, read the resulting `MEMORY.md` and give the user a short summary of what is now
+loaded — how many memories, and the notable decisions, instructions, and open commitments.
 
-- At the start of each session (auto-runs if connected via `memanto connect`)
-- After adding many new memories
-- Before committing the project (to share context with teammates)
-- Before switching agents or projects
-
-## MEMORY.md Structure
-
-```markdown
-# Agent Memory — my-agent
-> Last synced: 2025-03-15 14:30 UTC
-
-## Instructions
-- Always use type hints in Python (confidence: 1.0)
-
-## Decisions
-- Chose PostgreSQL for metadata storage (confidence: 0.95)
-
-## Commitments
-- Add rate limiting before v0.2 release (confidence: 1.0)
-...
-```
+This plugin already runs the sync on session start, so run it manually after storing a batch of
+new memories, before committing the project so teammates get the context, or when switching
+agents.

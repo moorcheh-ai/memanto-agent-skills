@@ -62,7 +62,10 @@ memanto memory sync \
 
 ## Auto-Sync via Hook (Claude Code)
 
-When connected via `memanto connect claude-code`, a hook runs sync automatically on every session start. No manual action needed.
+This plugin ships a `SessionStart` hook that runs the sync automatically every time a session
+starts or resumes, so `MEMORY.md` is current before your first message. `memanto connect
+claude-code` installs an equivalent hook for setups that are not using the plugin. No manual
+action needed in either case.
 
 ## MANDATORY: Read MEMORY.md First
 
