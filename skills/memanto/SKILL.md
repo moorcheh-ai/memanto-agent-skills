@@ -4,7 +4,9 @@ MEMANTO is a universal memory layer that gives AI agents long-term, persistent m
 
 ## Key Capabilities
 
-**Agent & Session Management** allows creating named agent identities, activating sessions with JWT tokens, and maintaining continuity across restarts.
+**Agent & Session Management** allows creating named agent identities, activating sessions with JWT tokens, maintaining continuity across restarts, and deleting agents. Deletion removes local metadata and prompts whether to also purge the Moorcheh cloud namespace.
+
+**File Upload** ingests documents (.pdf, .docx, .xlsx, .json, .txt, .csv, .md) directly into the agent's memory namespace. Uploaded content is processed, embedded, and immediately searchable via recall and answer.
 
 **Memory Storage** supports 13 distinct memory types — from facts and decisions to errors and commitments — each with confidence scoring and provenance tracking to prevent memory poisoning.
 
@@ -68,6 +70,6 @@ memanto answer "What are my pending commitments?"
 - `0.6–0.65` — Single observation, uncertain
 - `< 0.6` — Do NOT store. Too uncertain.
 
-**Provenance Types:** `explicit_statement` · `inferred` · `observed` · `corrected` · `validated`
+**Provenance Types:** `explicit_statement` · `inferred` · `observed` · `corrected` · `validated` · `imported`
 
 Common errors relate to missing API keys, expired sessions (re-run `memanto agent activate`), and missing agent IDs. See individual reference files for details.

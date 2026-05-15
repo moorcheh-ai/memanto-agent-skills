@@ -17,18 +17,24 @@ memanto recall "query" \
   --min-confidence 0.8 \
   --as-of "2d ago" \
   --changed-since "1h ago"
+
+# Chronological — no query needed
+memanto recall --recent --limit 10
 ```
 
 ## Parameters
 
 | Flag | Description | Default |
 |------|-------------|---------|
-| `query` | Natural language search query | Required |
+| `query` | Natural language search query | Required (omit for temporal flags) |
 | `--limit` | Max results to return | 10 |
 | `--type` | Filter by memory type | All types |
 | `--min-confidence` | Minimum trust score | 0.0 |
 | `--as-of` | Show memories as of a point in time | Now |
 | `--changed-since` | Only memories changed since a time | None |
+| `--recent` | List most recently stored memories (newest first); no `query` | Off |
+
+`--as-of`, `--changed-since`, and `--recent` are mutually exclusive.
 
 ## Examples
 
@@ -47,6 +53,10 @@ memanto recall "deployment" --changed-since "24h ago"
 
 # Historical state (what did we know 2 days ago?)
 memanto recall "auth setup" --as-of "2d ago"
+
+# Most recently stored memories (newest first, no query)
+memanto recall --recent --limit 10
+memanto recall --recent --type decision --limit 5
 
 # Find all commitments
 memanto recall "todo will implement" --type commitment
