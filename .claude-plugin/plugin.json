@@ -19,6 +19,5 @@
     "rag",
     "moorcheh",
     "memanto"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }
