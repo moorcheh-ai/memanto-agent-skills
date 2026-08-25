@@ -102,6 +102,18 @@ already have, and `/memanto:statusline remove` turns it off. It degrades honestl
 lying: `not configured`, `no active agent`, `session expired`, or `stale 2d ago` when
 `MEMORY.md` has drifted.
 
+**Memory operations read as English, not shell.** A `PostToolUse` hook replaces the raw
+command in chat with what actually happened:
+
+```
+👾 Memanto · stored a decision (confidence 0.95)
+👾 Memanto · recalled 7 memories
+👾 Memanto · MEMORY.md synced — 42 memories
+```
+
+It stays silent on anything it cannot describe confidently, and never runs for non-MEMANTO
+commands.
+
 **`MEMORY.md` stays current on its own.** A `SessionStart` hook runs `memanto memory sync`
 whenever a session starts or resumes, so the agent has full context from your first message.
 A `PreCompact` hook re-syncs before compaction, so context about to be summarized away is

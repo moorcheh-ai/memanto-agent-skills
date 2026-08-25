@@ -30,6 +30,39 @@ SYNC_TIMEOUT = 25
 STATUSLINE_REFRESH = 5
 
 
+def _claim(key: str, ttl: float = 10.0) -> bool:
+    """First invocation for `key` wins; a duplicate stays silent.
+
+    hooks.json registers each Python hook twice — once as `python`, once as
+    `python3` — because neither spelling exists on every platform. On a machine
+    where both resolve, both processes run, so the work must be claimed exactly
+    once or the user sees every notice twice.
+    """
+    import hashlib
+    import os
+    import tempfile
+    import time
+
+    path = os.path.join(
+        tempfile.gettempdir(),
+        f"memanto-hook-{hashlib.sha256(key.encode('utf-8')).hexdigest()[:24]}.lock",
+    )
+    try:
+        os.close(os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+        return True
+    except FileExistsError:
+        try:
+            if time.time() - os.stat(path).st_mtime > ttl:
+                os.unlink(path)
+                os.close(os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+                return True
+        except Exception:
+            pass
+        return False
+    except Exception:
+        return True  # never suppress the hook over an unexpected filesystem error
+
+
 def _out(text: str) -> None:
     """Write UTF-8 regardless of the console code page (Windows cp1252)."""
     try:
@@ -172,6 +205,9 @@ def _touch(marker: Path) -> None:
 def main() -> None:
     payload = _read_stdin()
     project_dir = _project_dir(payload)
+
+    if not _claim("sessionstart:" + str(payload.get("session_id") or project_dir)):
+        return
 
     lines = []
     try:
