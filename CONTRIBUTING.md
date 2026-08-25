@@ -15,12 +15,34 @@ Thank you for your interest in contributing!
 .claude-plugin/
 ├── plugin.json        # Claude Code plugin manifest
 └── marketplace.json   # Marketplace entry
+agents/                # Subagents — one .md per agent
 commands/              # Slash commands — one .md per command
-hooks/hooks.json       # SessionStart hook (MEMORY.md sync)
+hooks/
+├── hooks.json         # SessionStart (sync + statusline install), PreCompact (sync)
+└── session_start.py   # SessionStart implementation
+statusline.py          # Status line renderer
 skills/<skill-name>/
 ├── SKILL.md           # Skill definition (required, needs YAML frontmatter)
 └── references/*.md    # Detailed reference guides
 ```
+
+## Python in hooks and the status line
+
+Both are stdlib-only Python 3.10+ — `memanto` already requires Python, so this adds no
+dependency. Two constraints they must keep:
+
+- **Never crash.** A hook or status line that raises disrupts the session it decorates. Guard
+  every step and degrade to shorter output or none.
+- **Write UTF-8 explicitly.** Windows consoles default to cp1252, which cannot encode the
+  `👾` brand mark — without an explicit reconfigure the whole line silently vanishes.
+
+`hooks.json` registers both `python` and `python3` for SessionStart because neither spelling
+exists everywhere. Whichever is missing fails harmlessly, so anything they invoke must be
+idempotent.
+
+A plugin cannot ship a `statusLine`: plugin `settings.json` only honors `agent` and
+`subagentStatusLine`. The entry is written into the user's `~/.claude/settings.json`, once,
+and never over an existing one.
 
 ## SKILL.md Format
 

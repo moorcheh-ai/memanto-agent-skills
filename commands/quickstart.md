@@ -64,6 +64,14 @@ Read the file back and confirm it has content.
   other tools; `memanto connect list` shows all supported agents
 - `memanto migrate mem0` / `letta` / `supermemory` — import memory from another provider
 
+**7 — Point out what is already running**, briefly:
+
+- `MEMORY.md` refreshes automatically at the start of every session, and again before
+  compaction.
+- The `👾 Memanto` status line installs itself on the first session. `/memanto:statusline
+  preview` shows it; `/memanto:statusline remove` turns it off.
+- The `memory-scout` subagent gathers deep background before big work — worth naming
+  explicitly before a refactor.
+
 Finish by telling them the commands they will actually use day to day: `/memanto:remember`,
-`/memanto:recall`, `/memanto:answer`. Mention that `MEMORY.md` refreshes automatically at the
-start of every session.
+`/memanto:recall`, `/memanto:answer`, and `/memanto:capture` at the end of a session.

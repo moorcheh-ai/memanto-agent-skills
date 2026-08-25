@@ -91,15 +91,35 @@ Or just run `/memanto:quickstart` in Claude Code and it will walk you through al
 
 ## What you get in Claude Code
 
-**`MEMORY.md` stays current on its own.** The plugin installs a `SessionStart` hook that runs
-`memanto memory sync` whenever a session starts or resumes, so the agent has full context from
-your first message — no command to remember.
+**A status line showing what memory is doing.**
+
+```
+👾 Memanto · my-project · 42 memories · +3 this session · synced 2m ago
+```
+
+Installed automatically on the plugin's first session — it never overwrites a `statusLine` you
+already have, and `/memanto:statusline remove` turns it off. It degrades honestly rather than
+lying: `not configured`, `no active agent`, `session expired`, or `stale 2d ago` when
+`MEMORY.md` has drifted.
+
+**`MEMORY.md` stays current on its own.** A `SessionStart` hook runs `memanto memory sync`
+whenever a session starts or resumes, so the agent has full context from your first message.
+A `PreCompact` hook re-syncs before compaction, so context about to be summarized away is
+written to memory first — the one moment context is most likely to be lost.
+
+**A `memory-scout` subagent** for deep background. It fans out several recalls at once —
+task terms, standing conventions, past decisions, known traps, open commitments, recent
+changes — and returns a short sourced brief instead of a memory dump. It also surfaces
+contradictions rather than silently picking a winner. Ask for it by name, or let Claude
+delegate before a refactor:
+
+> "Use memory-scout to get background before we touch the auth module"
 
 **Claude reaches for memory unprompted.** The `memanto` skill loads automatically when you state
 a decision worth keeping or ask what was decided earlier, and it forbids answering "I don't have
 context on that" without checking memory first.
 
-**Eleven commands** for when you want to drive it explicitly:
+**Twelve commands** for when you want to drive it explicitly:
 
 | Command | What it does |
 |---|---|
@@ -114,6 +134,7 @@ context on that" without checking memory first.
 | `/memanto:sync` | Refresh `MEMORY.md` (or export an OKF bundle) |
 | `/memanto:session` | Show or switch the active agent |
 | `/memanto:status` | Health check — config, session, agents, what is stored |
+| `/memanto:statusline` | Install, preview, or remove the status line |
 
 ### Optional: capture memory automatically at session end
 

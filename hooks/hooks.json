@@ -1,8 +1,25 @@
 {
+  "description": "MEMANTO: persistent memory for Claude Code. SessionStart refreshes MEMORY.md and installs the status line once. PreCompact re-syncs before compaction, so context that is about to be summarized away survives in MEMORY.md. Two SessionStart entries register the two portable spellings of the Python launcher ('python' on Windows, 'python3' on most Linux/macOS); whichever is absent fails harmlessly and the script is idempotent, so a double run is a no-op.",
   "hooks": {
     "SessionStart": [
       {
         "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/session_start.py\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_start.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
         "hooks": [
           {
             "type": "command",
