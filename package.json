@@ -1,7 +1,7 @@
 {
   "name": "memanto-agent-skills",
-  "version": "0.1.0",
-  "description": "Agent Skills for giving AI agents persistent memory with MEMANTO — the Universal Memory Layer for Agentic AI",
+  "version": "0.2.0",
+  "description": "Agent Skills and Claude Code plugin for giving AI agents persistent memory with MEMANTO — the Universal Memory Layer for Agentic AI",
   "keywords": [
     "memanto",
     "memory",
@@ -35,6 +35,9 @@
   "files": [
     "skills/",
     "commands/",
+    "agents/",
+    "hooks/",
+    "statusline.py",
     ".claude-plugin/",
     ".cursor-plugin/",
     "AGENTS.md",

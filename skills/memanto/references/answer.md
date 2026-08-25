@@ -62,22 +62,3 @@ memanto answer "What did we decide about X?"
 ```
 
 Do NOT say "I don't have context on that" without running these first.
-
-## Python SDK (REST API)
-
-```python
-import httpx
-
-async def get_answer(agent_id: str, session_token: str, question: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"http://localhost:8000/api/v2/agents/{agent_id}/answer",
-            json={"question": question},
-            headers={
-                "X-Session-Token": session_token,
-            }
-        )
-        result = response.json()
-        print(result["answer"])
-        print(f"Sources: {len(result['sources'])} memories used")
-```

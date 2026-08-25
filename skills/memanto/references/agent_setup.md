@@ -10,16 +10,23 @@ memanto agent create my-agent
 
 With a pattern hint (influences initial bootstrap):
 ```bash
-memanto agent create my-agent --pattern tool       # Tool-use agent
-memanto agent create my-agent --pattern chat       # Conversational agent
-memanto agent create my-agent --pattern research   # Research agent
+memanto agent create my-agent --pattern tool      # Tool-use agent (default)
+memanto agent create my-agent --pattern project   # Project-scoped agent
+memanto agent create my-agent --pattern support   # Support agent
+
+# Optional description
+memanto agent create my-agent --description "Memory for the billing service"
 ```
 
 **What this does:**
 - Creates a Moorcheh namespace `memanto_agent_my-agent`
 - Saves agent metadata to `~/.memanto/agents/my-agent.json`
+- **Activates the agent immediately** — a new agent needs no separate activate step
 
 ## Activate a Session
+
+Activation is only needed for an agent that already exists — switching back to it, or restoring
+a session that could not auto-renew.
 
 ```bash
 memanto agent activate my-agent
@@ -74,7 +81,6 @@ memanto agent delete my-agent --force
 ```
 
 **What always happens:**
-- Calls `DELETE /api/v2/agents/{agent_id}`
 - Removes `~/.memanto/agents/{agent_id}.json`
 - Clears active session if this agent was currently active
 
@@ -84,15 +90,6 @@ memanto agent delete my-agent --force
 
 **Note:** Cloud memories at [console.moorcheh.ai/namespaces](https://console.moorcheh.ai/namespaces) survive local deletion by default. A re-created agent with the same ID can access them again.
 
-Or via the Python script:
-
-```bash
-uv run skills/memanto/scripts/delete_agent.py --agent-id my-agent
-
-# Skip prompts
-uv run skills/memanto/scripts/delete_agent.py --agent-id my-agent --force --keep-cloud
-uv run skills/memanto/scripts/delete_agent.py --agent-id my-agent --force --delete-cloud
-```
 
 ## Error Handling
 
@@ -102,31 +99,3 @@ uv run skills/memanto/scripts/delete_agent.py --agent-id my-agent --force --dele
 | `Agent not found` | Agent ID doesn't exist locally | Run `memanto agent list` to see available agents |
 | `Session expired` | Token lifetime exceeded | Run `memanto agent activate <id>` again |
 | `API key missing` | `MOORCHEH_API_KEY` not set | Run `memanto` to configure interactively |
-
-## Python SDK (REST API)
-
-```python
-import httpx
-import asyncio
-
-async def setup_agent():
-    base_url = "http://localhost:8000"
-
-    async with httpx.AsyncClient() as client:
-        # Create agent
-        resp = await client.post(
-            f"{base_url}/api/v2/agents",
-            json={"name": "my-agent"}
-        )
-        agent = resp.json()
-        print(f"Agent namespace: {agent.get('namespace')}")
-
-        # Activate session
-        resp = await client.post(f"{base_url}/api/v2/agents/my-agent/activate")
-        session = resp.json()
-        print(f"Session token: {session.get('session_token')}")
-        print(f"Expires: {session.get('expires_at')}")
-
-if __name__ == "__main__":
-    asyncio.run(setup_agent())
-```

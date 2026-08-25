@@ -5,15 +5,19 @@ MEMANTO can generate compressed daily summaries of recent agent activity and sto
 ## Enable Scheduling
 
 ```bash
-# Enable daily summary at 23:59 local time
-memanto schedule enable
-
-# Check schedule status
-memanto schedule status
-
-# Disable
-memanto schedule disable
+memanto schedule enable    # enable the nightly job
+memanto schedule status    # check it
+memanto schedule disable   # turn it off
 ```
+
+The nightly job is not just the summary. One run does three things:
+
+1. **Daily summary** — compresses the day's memories into a `context` memory
+2. **Conflict detection** — flags contradictions for review (see [conflicts.md](conflicts.md))
+3. **Expiry sweep** — retires memories your policy matches (see [expiry_policy.md](expiry_policy.md))
+
+Set your expiry policy deliberately *before* enabling the schedule — the nightly sweep does not
+stop to ask. `memanto policy show` reports what is currently in force.
 
 ## Manual Trigger
 
@@ -54,25 +58,15 @@ memanto recall "daily summary" --type context --limit 7
 memanto answer "What did we accomplish this week?"
 ```
 
-## Schedule File
-
-The schedule is stored at `~/.memanto/schedule.json`:
-
-```json
-{
-  "enabled": true,
-  "time": "23:55",
-  "agent_id": "my-agent",
-  "last_run": "2025-03-14T23:55:00Z",
-  "next_run": "2025-03-15T23:55:00Z"
-}
-```
-
 ## Implementation Notes
 
-The schedule manager uses a background process. On systems where background processes are not persistent (e.g., serverless), use a cron job instead:
+The schedule manager runs a background process. Where background processes do not persist
+(containers, serverless, CI), drive it from cron instead:
 
 ```bash
-# crontab entry
+# crontab entry — nightly summary for a specific agent
 55 23 * * * /usr/local/bin/memanto daily-summary --agent my-agent
 ```
+
+Check `memanto schedule status` to confirm the job is actually registered rather than assuming
+`enable` succeeded.

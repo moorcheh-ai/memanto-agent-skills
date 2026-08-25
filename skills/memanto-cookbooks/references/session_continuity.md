@@ -71,16 +71,19 @@ The agent MUST read this file at the start of every session.
 ## Session Token Lifecycle
 
 ```
-Activate (6h default)
+Activate (6h default)  —  memanto agent activate my-project --hours 12
     ↓
 Work (memories stored continuously)
     ↓
-Extend if needed: memanto session extend --hours 4
+Token nears expiry  →  auto-renews in place (enabled by default)
     ↓
-Session expires → re-activate: memanto agent activate my-project
+Auto-renew unavailable → re-activate: memanto agent activate my-project
     ↓
 All memories persist — only the auth token expires
 ```
+
+There is no "extend" command. Choose the lifetime up front with `--hours` on activation, and
+let auto-renewal handle the rest. `memanto session info` shows the time remaining.
 
 ## Daily Summary for Long-Running Projects
 

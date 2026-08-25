@@ -34,6 +34,25 @@ memanto remember "content" \
 | `--tags` | Comma-separated tags for retrieval | Recommended |
 | `--title` | Short title (auto-generated if omitted) | No |
 
+Short forms: `-t` (type), `-c` (confidence), `-s` (source), `-p` (provenance).
+
+## Bulk Storage
+
+```bash
+# From a JSON array of memory objects
+memanto remember --batch memories.json
+
+# Let MEMANTO extract memories from a conversation transcript
+# (a JSON array of {role, content} objects, or '-' for stdin)
+memanto remember --from-conversation transcript.json --dry-run   # preview only
+memanto remember --from-conversation transcript.json
+memanto remember --from-conversation transcript.json --max-memories 30
+```
+
+`--dry-run` shows what would be extracted without storing anything, and only works with
+`--from-conversation`. Always dry-run first — automated extraction over-collects, and pruning
+the preview is far cheaper than expiring thirty memories afterwards.
+
 ## Memory Types
 
 | Type | Confidence | When to Use |
@@ -141,29 +160,3 @@ memanto remember "Batch storing 100 memories at once is ~100x faster than storin
 4. **Duplicates** — Always run `memanto recall` first to check if similar memory exists
 5. **Missing tags** — Always include tags; they're the primary retrieval mechanism
 6. **Wrong confidence** — Don't use 0.9 for a single observation; use 0.65–0.75
-
-## Python SDK (REST API)
-
-```python
-import httpx
-import asyncio
-
-async def store_memory(agent_id: str, session_token: str):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"http://localhost:8000/api/v2/agents/{agent_id}/remember",
-            json={
-                "type": "decision",
-                "content": "Chose PostgreSQL over SQLite for production workloads.",
-                "confidence": 0.95,
-                "provenance": "explicit_statement",
-                "source": "my_agent",
-                "tags": ["database", "postgresql", "architecture"]
-            },
-            headers={
-                "X-Session-Token": session_token,
-            }
-        )
-        result = response.json()
-        print(f"Stored Memory ID: {result.get('memory_id')}")
-```

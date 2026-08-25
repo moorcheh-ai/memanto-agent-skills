@@ -1,18 +1,24 @@
 # File Upload — Ingest Documents into Agent Memory
 
-The `memanto upload` command ingests a document file into the active agent's Moorcheh namespace. Uploaded content is processed, embedded, and made immediately searchable via `memanto recall` and `memanto answer`.
+`memanto upload` ingests a document into the active agent's Moorcheh namespace. The content is
+processed, embedded, and immediately searchable via `memanto recall` and `memanto answer`.
 
-## When to Use File Upload
+## When to use it
 
-Use file upload to ground your agent in large reference documents that would be impractical to store as individual memories:
+Ground the agent in large reference documents that would be impractical to store as individual
+memories:
 
 - Architecture decision records, design docs, PRDs
 - API specifications (OpenAPI/Swagger JSON)
 - Meeting notes, interview transcripts
 - Spreadsheets with project data
-- Codebases exported as Markdown
+- Documentation exported as Markdown
 
-## Basic Usage
+**When not to use it:** source code, logs, and config files. Read those yourself and store the
+durable conclusions with `memanto remember`. Raw code chunks retrieve poorly against natural
+language queries, and they bloat the namespace.
+
+## Usage
 
 ```bash
 memanto upload path/to/document.pdf
@@ -20,9 +26,10 @@ memanto upload path/to/spec.md
 memanto upload path/to/data.xlsx
 ```
 
-An active session is required. Run `memanto agent activate <agent-id>` first.
+Requires an active agent. Run `memanto agent activate <agent-id>` first if `memanto status`
+shows none.
 
-## Supported File Types
+## Supported formats
 
 | Extension | Format |
 |-----------|--------|
@@ -34,84 +41,33 @@ An active session is required. Run `memanto agent activate <agent-id>` first.
 | `.csv` | Comma-separated values |
 | `.md` | Markdown |
 
-Maximum file size: **5 GB**
+Maximum file size: **5 GB**. Anything else (`.png`, `.zip`, …) is rejected with the allowed
+list.
 
-Unsupported types (e.g. `.png`, `.zip`) will be rejected with a 400 error listing the allowed extensions.
-
-## HTTP API
-
-```
-POST /api/v2/agents/{agent_id}/upload-file
-Content-Type: multipart/form-data
-Authorization: Bearer {moorcheh_api_key}
-X-Session-Token: {session_token}
-
-file: <binary>
-```
-
-### Response
-
-```json
-{
-  "agent_id": "my-agent",
-  "session_id": "sess-abc123",
-  "namespace": "memanto_agent_my-agent",
-  "file_name": "architecture.pdf",
-  "file_size": 204800,
-  "status": "uploaded",
-  "message": "File processed and indexed successfully"
-}
-```
-
-`status` is either `"uploaded"` (success) or `"failed"` (processing error).
-
-## Python Script
+## Verify the ingest
 
 ```bash
-uv run skills/memanto/scripts/upload_file.py path/to/document.pdf
-```
-
-Or directly:
-
-```bash
-python skills/memanto/scripts/upload_file.py path/to/notes.md
-```
-
-## curl Example
-
-```bash
-curl -X POST "http://localhost:8000/api/v2/agents/my-agent/upload-file" \
-  -H "Authorization: Bearer $MOORCHEH_API_KEY" \
-  -H "X-Session-Token: $SESSION_TOKEN" \
-  -F "file=@/path/to/document.pdf"
-```
-
-## After Upload — Recall Uploaded Content
-
-Once uploaded, the document's content is searchable using the same recall and answer commands:
-
-```bash
-# Search within uploaded content
-memanto recall "authentication flow" --limit 10
-
-# Ask questions grounded in the document
+memanto recall "<a distinctive phrase from the document>" --limit 5
 memanto answer "What are the rate limits described in the spec?"
 ```
 
-Uploaded file content is stored as memories in the agent's namespace and follows the same confidence scoring and semantic search as manually stored memories.
+Uploaded content becomes ordinary memories in the agent's namespace, carrying `imported`
+provenance, and is subject to the same semantic search and confidence scoring as anything you
+store by hand.
 
-## Error Handling
+## Errors
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `401 Unauthorized` | Missing or invalid session token | Run `memanto agent activate <id>` |
-| `400 Bad Request: unsupported file type` | File extension not in allowlist | Convert file to a supported format |
-| `404 Not Found` | Agent ID doesn't exist | Run `memanto agent list` |
-| `File not found` (local) | Path doesn't exist | Check the file path |
-| Session scope mismatch | Token is for a different agent | Activate the correct agent session |
+| `MEMANTO not configured` | No API key | Run `memanto`, or export `MOORCHEH_API_KEY` |
+| `No active agent` | Nothing activated | `memanto agent activate <id>` |
+| Unsupported file type | Extension not in the allowlist | Convert to a supported format |
+| File exceeds maximum upload size | Over 5 GB | Split the document |
+| `File not found` | Bad path | Check the path |
 
 ## Notes
 
-- The upload endpoint requires both `Authorization` (API key) **and** `X-Session-Token` headers.
-- Temporary files created during processing are automatically cleaned up by the server.
-- Re-uploading the same file creates additional memory entries — check for existing content with `memanto recall` first if you want to avoid duplicates.
+- Re-uploading the same file creates **additional** memory entries. Recall first if you are
+  unsure whether a document is already ingested — there is no dedupe on upload.
+- After a large ingest, run `memanto detect-conflicts`; imported documents frequently contradict
+  memories the agent already holds.

@@ -1,46 +1,35 @@
-# /memanto:recall
+---
+description: Search MEMANTO memories by meaning, type, or time
+argument-hint: <query> [--type X] [--recent] [--as-of DATE]
+allowed-tools: Bash(memanto:*)
+disable-model-invocation: true
+---
 
-Search persistent memories using semantic similarity.
+Search MEMANTO persistent memory for:
 
-## Syntax
+$ARGUMENTS
 
-```
-/memanto:recall query "<text>" [type <type>] [limit <n>] [min_confidence <0.0-1.0>]
-```
-
-## Parameters
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `query` | Natural language search | Required |
-| `type` | Filter by memory type | All types |
-| `limit` | Max results | 10 |
-| `min_confidence` | Minimum trust score | 0.0 |
-
-## Examples
+Pick the right mode:
 
 ```bash
-# General search
-memanto recall "database architecture"
+# Semantic search — the default
+memanto recall "$ARGUMENTS" --limit 10
 
-# Search decisions only
-memanto recall "frontend framework" --type decision
+# Narrow by type, confidence, or tags when the request implies it
+memanto recall "<query>" --type decision --min-confidence 0.9 --tags "security"
 
-# High-confidence facts
-memanto recall "authentication" --type fact --min-confidence 0.9
-
-# Load session context
-memanto recall "instructions decisions goals" --limit 20
-
-# Find commitments
-memanto recall "todo pending" --type commitment
+# Temporal modes — these take NO query
+memanto recall --recent --limit 10            # newest first
+memanto recall --as-of "2026-01-15"           # what was true at that date
+memanto recall --changed-since "2026-08-01"   # what changed since then
 ```
 
-## Session Start Pattern
+Recall returns active and expired memories together, each labelled. Add `--active` to exclude
+expired ones, `--expired` to see only those.
 
-Always run this at the beginning of each session:
+If the user asked a **question** rather than for a list of memories, use `/memanto:answer`
+instead — it synthesizes a single grounded response rather than returning chunks.
 
-```bash
-memanto recall "instructions decisions goals" --limit 20
-memanto answer "What are my pending commitments?"
-```
+After running, summarize what you found and flag anything that contradicts something else in
+the results. If nothing comes back, say so plainly and suggest a broader query — do not
+silently conclude the topic was never discussed.

@@ -21,6 +21,18 @@ memanto answer "What does the user prefer for code style?"
 
 ## REST API
 
+The REST endpoints below are served by a **local MEMANTO server**, which is not running by
+default. Start it first:
+
+```bash
+memanto serve          # defaults to http://localhost:8000
+memanto serve --port 9000
+```
+
+The CLI itself talks to Moorcheh directly and needs no server — `memanto serve` is only for
+building applications against the HTTP API (and for `memanto ui`). Point `MEMANTO_SERVER_URL` at
+the host you chose rather than hardcoding the port.
+
 ```python
 import httpx
 

@@ -1,43 +1,36 @@
-# /memanto:session
+---
+description: Show or switch the active MEMANTO agent session
+argument-hint: [agent-id]
+allowed-tools: Bash(memanto:*)
+disable-model-invocation: true
+---
 
-Manage MEMANTO agent sessions — create, activate, extend, or inspect.
+Manage the MEMANTO agent session. Target agent (may be empty): `$ARGUMENTS`
 
-## Syntax
-
-```
-/memanto:session agent_id <id> [action activate|info|extend] [duration_hours <n>]
-```
-
-## Examples
+**If an agent id was given**, activate it:
 
 ```bash
-# Activate a session
-memanto agent activate my-agent
+memanto agent activate $ARGUMENTS
+```
 
-# Check session status
+Add `--hours <n>` for a non-default lifetime (default 6). If the agent does not exist yet,
+`memanto agent create $ARGUMENTS` creates **and** activates it in one step.
+
+**If no agent id was given**, report the current state:
+
+```bash
 memanto session info
-
-# Extend current session
-memanto session extend --hours 4
-
-# List all agents
 memanto agent list
-
-# Create a new agent
-memanto agent create my-agent --pattern tool
 ```
 
-## Session Lifecycle
+Then summarize: which agent is active, how long the session has left, and what other agents
+exist.
 
-1. `memanto agent create <id>` — Create agent identity (one time)
-2. `memanto agent activate <id>` — Start a session (each work session)
-3. `memanto session info` — Check status and time remaining
-4. `memanto session extend` — Extend before expiry
-5. `memanto agent deactivate <id>` — End session
+Notes:
 
-## Error: No Active Session
-
-If you see "No active session", run:
-```bash
-memanto agent activate <agent-id>
-```
+- `memanto agent create <id>` activates immediately — there is no separate activate step for a
+  brand-new agent.
+- Sessions **auto-renew** by default, so an expired token usually recovers on its own. If a
+  command still reports no active session, re-run `memanto agent activate <id>`.
+- `memanto agent deactivate` ends the current session and takes **no** agent argument.
+- Only one agent is active at a time.
