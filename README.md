@@ -13,12 +13,11 @@
 
 ---
 
-Each skill is a folder of instructions and references that agents like Claude Code, Cursor,
-GitHub Copilot, Codex, Windsurf, and Gemini CLI can discover, giving them persistent memory
-across sessions.
+Each skill is a folder of instructions and references that coding agents discover
+automatically, giving them persistent memory across sessions.
 
 Works with any agent that supports the [Agent Skills](https://agentskills.io/home#adoption)
-format.
+format, plus native plugins for Claude Code and Cursor.
 
 ## What is MEMANTO?
 
@@ -41,7 +40,16 @@ latency. It gives AI agents:
 /plugin install memanto
 ```
 
-### Using npx skills (Cursor, Gemini CLI, Codex, etc.)
+### Cursor plugin
+
+```bash
+# Add this repository as a Cursor plugin, then enable "memanto"
+```
+
+Ships skills, commands, an always-on rule, and `sessionStart` / `preCompact` hooks that keep
+`MEMORY.md` current.
+
+### Any other agent (npx skills)
 
 ```bash
 npx skills add moorcheh-ai/memanto-agent-skills
@@ -51,9 +59,34 @@ npx skills add moorcheh-ai/memanto-agent-skills
 
 ```bash
 pip install memanto
-memanto connect claude-code   # or cursor, codex, windsurf, gemini-cli, cline, roo, goose, …
-memanto connect list          # everything supported
+memanto connect claude-code   # writes instructions, skills, and hooks into the project
+memanto connect list          # every supported agent and its install status
+memanto connect multi         # pick several at once
 ```
+
+### Supported agents
+
+`memanto connect <name>` wires memory into each of these. The **Plugin** column marks the two
+that also install as a native plugin from this repository:
+
+| Agent | `connect` name | Instructions land in | Plugin |
+|---|---|---|:--:|
+| Claude Code | `claude-code` | `CLAUDE.md` | ✅ |
+| Cursor | `cursor` | `.cursor/rules/memanto.mdc` | ✅ |
+| Codex CLI | `codex` | `AGENTS.md` | |
+| OpenCode | `opencode` | `AGENTS.md` | |
+| GitHub Copilot | `github-copilot` | `.github/copilot-instructions.md` | |
+| Windsurf | `windsurf` | `.windsurfrules` | |
+| Gemini CLI | `gemini-cli` | `GEMINI.md` | |
+| Cline | `cline` | `.clinerules/memanto.md` | |
+| Continue | `continue` | `.continue/rules/memanto.md` | |
+| Roo Code | `roo` | `.roo/rules/memanto.md` | |
+| Augment Code | `augment` | `.augment/rules/memanto.md` | |
+| Antigravity | `antigravity` | `.agent/skills` | |
+| Goose | `goose` | `.goose/skills` | |
+
+Every agent gets the two skills and the memory instructions. Claude Code and Cursor also get
+commands and hooks, so `MEMORY.md` refreshes without anyone asking.
 
 ### Manual
 
@@ -118,6 +151,13 @@ commands.
 whenever a session starts or resumes, so the agent has full context from your first message.
 A `PreCompact` hook re-syncs before compaction, so context about to be summarized away is
 written to memory first — the one moment context is most likely to be lost.
+
+**Cursor gets the same treatment.** The Cursor plugin ships the skills, the commands, an
+always-on rule, and `sessionStart` / `preCompact` hooks running the same
+`hooks/session_start.py` — so `MEMORY.md` is current there too. Cursor uses camelCase hook
+names and Claude Code uses PascalCase, so the two live in separate files
+(`hooks/cursor-hooks.json` and `hooks/hooks.json`); Claude Code's loader rejects a file
+containing Cursor's event names.
 
 **A `memory-scout` subagent** for deep background. It fans out several recalls at once —
 task terms, standing conventions, past decisions, known traps, open commitments, recent
