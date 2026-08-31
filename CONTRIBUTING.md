@@ -16,10 +16,13 @@ Thank you for your interest in contributing!
 ├── plugin.json        # Claude Code plugin manifest
 └── marketplace.json   # Marketplace entry
 agents/                # Subagents — one .md per agent
-commands/              # Slash commands — one .md per command
+commands/              # Slash commands — one .md per command (Claude Code + Cursor)
+rules/                 # Cursor always-on rules (.mdc)
 hooks/
-├── hooks.json         # SessionStart (sync + statusline install), PreCompact (sync)
-└── session_start.py   # SessionStart implementation
+├── hooks.json         # Claude Code: SessionStart, PreCompact, PostToolUse
+├── cursor-hooks.json  # Cursor: sessionStart, preCompact
+├── session_start.py   # shared, takes --host to vary per editor
+└── notify.py          # PostToolUse notice renderer
 statusline.py          # Status line renderer
 skills/<skill-name>/
 ├── SKILL.md           # Skill definition (required, needs YAML frontmatter)
@@ -43,6 +46,30 @@ idempotent.
 A plugin cannot ship a `statusLine`: plugin `settings.json` only honors `agent` and
 `subagentStatusLine`. The entry is written into the user's `~/.claude/settings.json`, once,
 and never over an existing one.
+
+## Two hook files, on purpose
+
+Claude Code and Cursor both auto-discover `hooks/hooks.json`, but their event names differ in
+case (`SessionStart` vs `sessionStart`). Claude Code's loader **rejects** a hooks file that
+contains Cursor's names:
+
+```
+✘ hooks.sessionStart: Invalid key in record
+```
+
+So Cursor's hooks live in `hooks/cursor-hooks.json`, pointed at by the `hooks` field in
+`.cursor-plugin/plugin.json`. Both call the same `hooks/session_start.py`, which takes
+`--host` so it only offers the Claude Code status line to Claude Code.
+
+Cursor's manifest keys are `skills`, `commands`, `rules`, `hooks`, `mcpServers` — there is no
+`skillsDir`. Specifying a field replaces folder discovery for that component.
+
+## Subprocess output
+
+Anything that shells out to `memanto` must pass `encoding="utf-8", errors="replace"` to
+`subprocess.run`. The CLI emits Rich box-drawing and spinner glyphs; without an explicit codec
+Python decodes them with the locale code page and the reader thread dies, silently discarding
+the output.
 
 ## SKILL.md Format
 

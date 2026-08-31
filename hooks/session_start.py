@@ -103,6 +103,12 @@ def sync_memory(project_dir: str) -> str | None:
             ["memanto", "memory", "sync", "--project-dir", project_dir],
             capture_output=True,
             text=True,
+            # The CLI emits Rich box-drawing and spinner glyphs. Without an
+            # explicit codec, Python decodes the child's output with the locale
+            # code page (cp1252 on Windows) and the reader thread dies on them,
+            # silently discarding the result.
+            encoding="utf-8",
+            errors="replace",
             timeout=SYNC_TIMEOUT,
         )
     except FileNotFoundError:
@@ -203,10 +209,19 @@ def _touch(marker: Path) -> None:
 
 
 def main() -> None:
+    # --host names the editor running this hook. Only Claude Code gets the
+    # status line offer; every other host shares the MEMORY.md refresh.
+    host = "claude-code"
+    for i, arg in enumerate(sys.argv[1:]):
+        if arg == "--host" and i + 2 <= len(sys.argv[1:]):
+            host = sys.argv[i + 2]
+        elif arg.startswith("--host="):
+            host = arg.split("=", 1)[1]
+
     payload = _read_stdin()
     project_dir = _project_dir(payload)
 
-    if not _claim("sessionstart:" + str(payload.get("session_id") or project_dir)):
+    if not _claim(f"sessionstart:{host}:" + str(payload.get("session_id") or project_dir)):
         return
 
     lines = []
@@ -217,12 +232,13 @@ def main() -> None:
     except Exception:
         pass
 
-    try:
-        notice = install_statusline()
-        if notice:
-            lines.append(notice)
-    except Exception:
-        pass
+    if host == "claude-code":
+        try:
+            notice = install_statusline()
+            if notice:
+                lines.append(notice)
+        except Exception:
+            pass
 
     if lines:
         _out("\n".join(lines))

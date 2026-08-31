@@ -1,13 +1,24 @@
 {
   "name": "memanto",
-  "displayName": "MEMANTO",
+  "description": "Persistent memory for Cursor — store decisions, recall them semantically, and answer questions grounded in everything the agent has learned.",
   "version": "0.2.0",
-  "description": "MEMANTO plugin for Cursor — persistent memory, semantic recall, and RAG for AI agents",
   "author": {
-    "name": "Moorcheh AI",
-    "url": "https://moorcheh.ai"
+    "name": "Moorcheh AI"
   },
   "homepage": "https://docs.memanto.ai",
+  "repository": "https://github.com/moorcheh-ai/memanto-agent-skills",
   "license": "MIT",
-  "skillsDir": "./skills/"
+  "keywords": [
+    "memory",
+    "persistent-memory",
+    "agent-memory",
+    "semantic-search",
+    "rag",
+    "moorcheh",
+    "memanto"
+  ],
+  "skills": "skills",
+  "commands": "commands",
+  "rules": "rules",
+  "hooks": "hooks/cursor-hooks.json"
 }

@@ -1,0 +1,83 @@
+---
+description: MEMANTO persistent memory — always check memory before claiming you lack context, and store durable decisions as they happen.
+alwaysApply: true
+---
+
+# MEMANTO — persistent memory
+
+This project uses MEMANTO for memory that survives across sessions. `memanto` commands are
+**real shell commands**. Run them. Never simulate one or describe what it would return — if you
+cannot run a shell, say so rather than inventing memory state.
+
+## Before saying you do not know
+
+Before answering "I don't know", "I don't have context on that", or "we haven't discussed
+that", you MUST run one of:
+
+```bash
+memanto recall "<topic>" --limit 10
+memanto answer "<the user's question>"
+```
+
+The answer is usually already stored. Claiming ignorance without checking is a failure.
+
+## At the start of work
+
+`MEMORY.md` in the project root is a snapshot of everything the agent knows. Read it before
+acting — it carries standing instructions, past decisions, and open commitments. Refresh it
+with:
+
+```bash
+memanto memory sync --project-dir .
+```
+
+## Store decisions as they happen
+
+When the user states a decision, preference, correction, or commitment worth keeping:
+
+```bash
+memanto remember "<self-contained statement, including the reason>" \
+  --type decision --confidence 0.95 --provenance explicit_statement \
+  --source cursor --tags "two,to,five,tags"
+```
+
+Rules:
+
+- Recall first, so you update rather than duplicate.
+- Pick one type: `fact` `decision` `preference` `instruction` `goal` `commitment` `artifact`
+  `learning` `event` `relationship` `observation` `error` `context`
+- Confidence: `1.0` explicit statement · `0.9–0.95` strong consensus · `0.8–0.85` pattern seen
+  three or more times · `0.7–0.75` reasonable inference. **Below 0.6, do not store.**
+- Provenance: `explicit_statement` `inferred` `observed` `corrected` `validated` `imported`
+- Write content that stands alone. "Fixed the bug" is useless; "Fixed OAuth token expiry by
+  refreshing 60s early, commit abc123" is not.
+
+## Retrieving
+
+```bash
+memanto recall "query" --limit 10 --active     # raw memories to read and act on
+memanto recall --recent --limit 10             # newest first, no query
+memanto answer "what did we decide about X?"   # one synthesized, grounded answer
+```
+
+Use `recall` when your next step is *read these and act*. Use `answer` when your next step is
+*deliver this as the answer*.
+
+## Correcting
+
+When the user corrects you, retire the wrong memory and store the correction so the reason
+survives:
+
+```bash
+memanto memory expire <id> --reason "corrected-by-user"
+memanto remember "<the corrected fact>" --type learning --confidence 1.0 \
+  --provenance corrected --source cursor --tags "correction,<topic>"
+```
+
+Prefer `memanto memory expire` over `memanto forget` — expiry is reversible and keeps the audit
+trail.
+
+## Privacy
+
+Never store secrets, credentials, tokens, or personal data. Anything the user wraps in
+`<private>…</private>` must not be stored at all.
