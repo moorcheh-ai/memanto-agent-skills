@@ -21,6 +21,7 @@ rules/                 # Cursor always-on rules (.mdc)
 hooks/
 ├── hooks.json         # Claude Code: SessionStart, PreCompact, PostToolUse
 ├── cursor-hooks.json  # Cursor: sessionStart, preCompact
+├── codex-hooks.json   # Codex: SessionStart, PreCompact (copied into a project, not loaded here)
 ├── session_start.py   # shared, takes --host to vary per editor
 └── notify.py          # PostToolUse notice renderer
 statusline.py          # Status line renderer
@@ -63,6 +64,12 @@ So Cursor's hooks live in `hooks/cursor-hooks.json`, pointed at by the `hooks` f
 
 Cursor's manifest keys are `skills`, `commands`, `rules`, `hooks`, `mcpServers` — there is no
 `skillsDir`. Specifying a field replaces folder discovery for that component.
+
+Codex is the odd one out: it has no plugin loader at all, and reads hooks only from
+`<project>/.codex/hooks.json` or `~/.codex/hooks.json`. So `hooks/codex-hooks.json` here is a
+copyable original, not a file Codex loads from this repository. `memanto connect codex` writes
+the same content — keep the two in step, and regenerate this file from
+`memanto.cli.connect.agent_registry.CODEX` rather than editing it by hand.
 
 ## Subprocess output
 
