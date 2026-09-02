@@ -49,11 +49,25 @@ latency. It gives AI agents:
 Ships skills, commands, an always-on rule, and `sessionStart` / `preCompact` hooks that keep
 `MEMORY.md` current.
 
+### Codex CLI
+
+```bash
+memanto connect codex          # writes AGENTS.md, the skill, and .codex/hooks.json
+```
+
+Codex has no plugin loader — it only reads `.codex/hooks.json` from your project (or
+`~/.codex/hooks.json`). `memanto connect codex` puts it there for you. To wire it by hand
+instead, copy [`hooks/codex-hooks.json`](hooks/codex-hooks.json) from this repository to
+`.codex/hooks.json` in your project; it is the same file.
+
 ### Any other agent (npx skills)
 
 ```bash
 npx skills add moorcheh-ai/memanto-agent-skills
 ```
+
+This installs the skills only. For hooks, use `memanto connect <agent>` or one of the two
+plugins above.
 
 ### Via the memanto CLI
 
@@ -66,27 +80,30 @@ memanto connect multi         # pick several at once
 
 ### Supported agents
 
-`memanto connect <name>` wires memory into each of these. The **Plugin** column marks the two
-that also install as a native plugin from this repository:
+`memanto connect <name>` wires memory into each of these. **Plugin** marks the two that also
+install as a native plugin from this repository; **Hooks** marks the ones where `MEMORY.md`
+refreshes on its own:
 
-| Agent | `connect` name | Instructions land in | Plugin |
-|---|---|---|:--:|
-| Claude Code | `claude-code` | `CLAUDE.md` | ✅ |
-| Cursor | `cursor` | `.cursor/rules/memanto.mdc` | ✅ |
-| Codex CLI | `codex` | `AGENTS.md` | |
-| OpenCode | `opencode` | `AGENTS.md` | |
-| GitHub Copilot | `github-copilot` | `.github/copilot-instructions.md` | |
-| Windsurf | `windsurf` | `.windsurfrules` | |
-| Gemini CLI | `gemini-cli` | `GEMINI.md` | |
-| Cline | `cline` | `.clinerules/memanto.md` | |
-| Continue | `continue` | `.continue/rules/memanto.md` | |
-| Roo Code | `roo` | `.roo/rules/memanto.md` | |
-| Augment Code | `augment` | `.augment/rules/memanto.md` | |
-| Antigravity | `antigravity` | `.agent/skills` | |
-| Goose | `goose` | `.goose/skills` | |
+| Agent | `connect` name | Instructions land in | Plugin | Hooks |
+|---|---|---|:--:|:--:|
+| Claude Code | `claude-code` | `CLAUDE.md` | ✅ | ✅ |
+| Cursor | `cursor` | `.cursor/rules/memanto.mdc` | ✅ | ✅ |
+| Codex CLI | `codex` | `AGENTS.md` | | ✅ |
+| OpenCode | `opencode` | `AGENTS.md` | | |
+| GitHub Copilot | `github-copilot` | `.github/copilot-instructions.md` | | |
+| Windsurf | `windsurf` | `.windsurfrules` | | |
+| Gemini CLI | `gemini-cli` | `GEMINI.md` | | |
+| Cline | `cline` | `.clinerules/memanto.md` | | |
+| Continue | `continue` | `.continue/rules/memanto.md` | | |
+| Roo Code | `roo` | `.roo/rules/memanto.md` | | |
+| Augment Code | `augment` | `.augment/rules/memanto.md` | | |
+| Antigravity | `antigravity` | `.agent/skills` | | |
+| Goose | `goose` | `.goose/skills` | | |
+| Pi | `pi` | `AGENTS.md` | | |
 
 Every agent gets the two skills and the memory instructions. Claude Code and Cursor also get
-commands and hooks, so `MEMORY.md` refreshes without anyone asking.
+commands, and all three hook-capable agents refresh `MEMORY.md` without anyone asking — Codex
+via `.codex/hooks.json`, which `memanto connect codex` writes for you.
 
 ### Manual
 
@@ -151,6 +168,12 @@ commands.
 whenever a session starts or resumes, so the agent has full context from your first message.
 A `PreCompact` hook re-syncs before compaction, so context about to be summarized away is
 written to memory first — the one moment context is most likely to be lost.
+
+**Codex gets hooks too.** `SessionStart` and `PreCompact` run the same
+`memanto memory sync`, and Codex renders a `statusMessage` in its TUI while they work.
+Because Codex loads no plugin, these live in your project's `.codex/hooks.json` rather than
+inside this repository — `memanto connect codex` writes it, and
+[`hooks/codex-hooks.json`](hooks/codex-hooks.json) is the copyable original.
 
 **Cursor gets the same treatment.** The Cursor plugin ships the skills, the commands, an
 always-on rule, and `sessionStart` / `preCompact` hooks running the same
