@@ -1,4 +1,5 @@
 ---
+name: status
 description: Show MEMANTO health — config, session, agents, memory counts
 allowed-tools: Bash(memanto:*)
 disable-model-invocation: true

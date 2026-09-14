@@ -1,4 +1,5 @@
 ---
+name: conflicts
 description: Detect and resolve contradictory MEMANTO memories
 argument-hint: [YYYY-MM-DD]
 allowed-tools: Bash(memanto:*)

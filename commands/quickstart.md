@@ -1,4 +1,5 @@
 ---
+name: quickstart
 description: Set up MEMANTO for this project, end to end
 allowed-tools: Bash(memanto:*), Bash(pip install memanto), Read
 disable-model-invocation: true

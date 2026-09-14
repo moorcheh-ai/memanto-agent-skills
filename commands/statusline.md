@@ -1,4 +1,5 @@
 ---
+name: statusline
 description: Install, preview, or remove the MEMANTO status line
 argument-hint: [install | remove | preview]
 allowed-tools: Bash, Read, Edit

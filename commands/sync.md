@@ -1,4 +1,5 @@
 ---
+name: sync
 description: Sync MEMANTO memories into the project's MEMORY.md
 argument-hint: [project-dir]
 allowed-tools: Bash(memanto:*)

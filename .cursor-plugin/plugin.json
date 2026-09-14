@@ -8,6 +8,7 @@
   "homepage": "https://docs.memanto.ai",
   "repository": "https://github.com/moorcheh-ai/memanto-agent-skills",
   "license": "MIT",
+  "logo": "assets/logo.svg",
   "keywords": [
     "memory",
     "persistent-memory",

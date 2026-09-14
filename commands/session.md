@@ -1,4 +1,5 @@
 ---
+name: session
 description: Show or switch the active MEMANTO agent session
 argument-hint: [agent-id]
 allowed-tools: Bash(memanto:*)
