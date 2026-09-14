@@ -1,4 +1,5 @@
 ---
+name: answer
 description: Answer a question from MEMANTO memory (RAG)
 argument-hint: <question>
 allowed-tools: Bash(memanto:*)

@@ -1,4 +1,5 @@
 ---
+name: capture
 description: Review this session and store what is worth remembering
 allowed-tools: Bash(memanto:*)
 disable-model-invocation: true

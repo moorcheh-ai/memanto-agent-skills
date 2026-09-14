@@ -1,4 +1,5 @@
 ---
+name: recall
 description: Search MEMANTO memories by meaning, type, or time
 argument-hint: <query> [--type X] [--recent] [--as-of DATE]
 allowed-tools: Bash(memanto:*)

@@ -1,4 +1,5 @@
 ---
+name: upload
 description: Ingest a document into MEMANTO memory
 argument-hint: <file-path>
 allowed-tools: Bash(memanto:*)

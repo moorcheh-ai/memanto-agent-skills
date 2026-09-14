@@ -1,4 +1,5 @@
 ---
+name: forget
 description: Correct, expire, or delete a MEMANTO memory
 argument-hint: <memory-id or description of what is wrong>
 allowed-tools: Bash(memanto:*)

@@ -1,4 +1,5 @@
 ---
+name: remember
 description: Store something in MEMANTO persistent memory
 argument-hint: <what to remember>
 allowed-tools: Bash(memanto:*)
